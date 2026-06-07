@@ -37,4 +37,40 @@ The personal data in the app stays private. That's a design principle and a futu
 
 ---
 
+## 8 June 2026 — The coaching layer
+
+### What's missing from the current app
+The app receives. It doesn't respond. It holds what you put in but it doesn't engage with it. That's the gap.
+
+What's needed is a coaching layer — a presence in each room that you can speak to, that reads what you've said and responds. Not with advice, not with a checklist, but with attention. One question back. Something that helps you find your own thinking.
+
+### How it would work in practice
+Each room gets a **"Talk about today"** space. You open it, you speak — using Wispr Flow or just typing — and Claude responds. The conversation lives in the room. The spiritual room would feel different from the physical room. The tone would be appropriate to what that room holds.
+
+### The design principle: Claude speaks less than you do
+Always. The coaching layer is not there to give answers. It's there to hold the thinking, reflect what it notices, ask one good question. This is completely consistent with the Thinking Environment — the incisive question, the quality of attention, not the volume of guidance.
+
+### Length doesn't matter
+Some mornings two words. Some mornings a long pour before you can even find the question. Both are fine. Claude reads the whole thing and responds to what's actually there. No patience limit. No need to be concise. The app holds whatever comes.
+
+### The walking conversation
+The fullest version of the coaching layer: you're walking, outside, moving. You speak into Four Rooms. Claude responds — and you *hear* the response, spoken back to you, so you never have to look at the screen.
+
+The pieces that make this possible all exist now:
+- Wispr Flow for speaking
+- Claude API for the response
+- Voice output via the browser's built-in text-to-speech, or running the Claude voice app alongside
+
+This is not a screen-based experience. It's a conversation that happens while you're living — walking the dog, moving through the morning. That's when thinking flows most freely. The app should meet you there.
+
+### Why this matters for the larger vision
+Thinking happens in motion, in conversation, in relationship. Not sitting at a desk filling in boxes. A coaching layer built on these principles — Claude as a thinking companion, not an advice machine — is completely aligned with the Thinking Environment, Parker Palmer, and the SGI practice of turning things over rather than forcing answers.
+
+This is the thing that would make Four Rooms genuinely different from anything else out there.
+
+### Technical note
+Building the coaching layer requires connecting to the Claude API — a small server component beyond the current static file. Straightforward to build. Planned for the next significant session.
+
+---
+
 *Add to this log whenever a session produces thinking worth keeping.*
