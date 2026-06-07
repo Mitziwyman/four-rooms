@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Four Rooms</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --deep-red:    #9B2020;
+      --soft-pink:   #E8A0A0;
+      --gold:        #C49A2A;
+      --gold-light:  #E8C55A;
+      --gold-pale:   #FDF6E3;
+      --sage:        #6A9E72;
+      --bg:          #FDFAF4;
+      --bg-card:     #FFFFFF;
+      --bg-warm:     #FBF6EC;
+      --text-main:   #2C2416;
+      --text-soft:   #5A4A30;
+      --text-muted:  #9A8A72;
+      --border:      rgba(196, 154, 42, 0.22);
+      --border-soft: rgba(196, 154, 42, 0.12);
+      --font: 'Georgia', 'Times New Roman', serif;
+      --font-sans: -apple-system, 'Helvetica Neue', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font);
+      font-size: 18px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── App Shell ──────────────────────────────────────────── */
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* ── Nav bar ────────────────────────────────────────────── */
+    #nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(253,250,244,0.96);
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #nav button {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      padding: 10px 4px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #nav button.active { color: var(--gold); }
+    #nav button .nav-icon { font-size: 18px; line-height: 1; }
+
+    /* ── Page system ────────────────────────────────────────── */
+    .page { display: none; padding: 0; }
+    .page.active { display: block; }
+
+    /* ── Morning Page ───────────────────────────────────────── */
+    #morning-header {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: var(--bg-warm);
+    }
+
+    #morning-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #morning-header .header-overlay { display: none; }
+    #morning-header .header-text { display: none; }
+
+    .morning-greeting {
+      padding: 24px 24px 0;
+    }
+
+    .morning-greeting .header-date {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .morning-greeting .header-greeting {
+      font-size: 24px;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .morning-body {
+      padding: 20px 24px 0;
+    }
+
+    /* Daily question */
+    .daily-question {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 8px rgba(196,154,42,0.07);
+    }
+
+    .daily-question p {
+      font-style: italic;
+      color: var(--text-main);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* Room list */
+    .rooms-label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .room-row {
+      display: flex;
+      align-items: center;
+      padding: 18px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, box-shadow 0.15s;
+      gap: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+
+    .room-row:active { background: var(--gold-pale); }
+
+    .room-row .room-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .room-row .room-info { flex: 1; }
+    .room-row .room-name {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .room-row .room-prompt {
+      font-size: 15px;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .room-row .room-status {
+      font-size: 18px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .dot-spiritual { background: var(--gold); }
+    .dot-physical  { background: var(--sage); }
+    .dot-mental    { background: #7AAAC8; }
+    .dot-emotional { background: #D48A8A; }
+
+    /* Resistance line */
+    .resistance-line {
+      text-align: center;
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 15px;
+      margin: 28px 0 12px;
+      padding: 0 24px;
+      line-height: 1.7;
+    }
+
+    /* ── Room Pages ─────────────────────────────────────────── */
+    .room-page-header {
+      padding: 52px 24px 28px;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--bg-warm);
+    }
+
+    .room-back {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--gold);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .room-back:active { opacity: 0.7; }
+
+    .room-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .room-title-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .room-title {
+      font-size: 28px;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .room-aspiration {
+      font-style: italic;
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.7;
+      padding-left: 24px;
+      border-left: 2px solid var(--border);
+    }
+
+    .room-body {
+      padding: 28px 24px;
+    }
+
+    /* Section headers inside rooms */
+    .section-label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      margin-top: 28px;
+    }
+
+    .section-label:first-child { margin-top: 0; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+
+    .card p {
+      color: var(--text-soft);
+      font-size: 16px;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+
+    .card p:last-child { margin-bottom: 0; }
+
+    .card p em { color: var(--text-main); font-style: italic; }
+
+    /* Teaching block */
+    .teaching-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--gold);
+      border-radius: 10px;
+      padding: 24px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 8px rgba(196,154,42,0.06);
+    }
+
+    .teaching-block p {
+      color: var(--text-soft);
+      font-size: 16px;
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+
+    .teaching-block p:last-child { margin-bottom: 0; }
+
+    /* Phrase block */
+    .phrase-block {
+      background: var(--gold-pale);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--deep-red);
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 14px;
+    }
+
+    .phrase-block p {
+      font-style: italic;
+      color: var(--text-main);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* Tap log buttons */
+    .tap-log {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tap-btn {
+      flex: 1;
+      background: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-soft);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      padding: 13px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1.3;
+    }
+
+    .tap-btn:active { opacity: 0.8; }
+
+    .tap-btn.selected-yes    { background: #EEF7EF; border-color: var(--sage); color: #3A7A42; }
+    .tap-btn.selected-little { background: var(--gold-pale); border-color: var(--gold); color: #8A6010; }
+    .tap-btn.selected-not    { background: #F8F4F0; border-color: #C8B8A0; color: var(--text-muted); }
+
+    /* Intention input */
+    .intention-input {
+      width: 100%;
+      background: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-family: var(--font);
+      font-size: 16px;
+      padding: 16px 18px;
+      resize: none;
+      min-height: 88px;
+      margin-top: 14px;
+      line-height: 1.65;
+      -webkit-appearance: none;
+    }
+
+    .intention-input:focus {
+      outline: none;
+      border-color: rgba(196, 154, 42, 0.5);
+      box-shadow: 0 0 0 3px rgba(196,154,42,0.08);
+    }
+
+    .intention-input::placeholder { color: var(--text-muted); }
+
+    /* Counter display */
+    .counter-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+
+    .counter-label {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    .counter-value {
+      font-size: 24px;
+      color: var(--gold);
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+
+    .counter-btn {
+      background: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 20px;
+      width: 40px; height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .counter-btn:active { background: var(--gold-pale); }
+
+    /* ACBT phases */
+    .acbt-phase {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+    }
+
+    .acbt-phase-label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 8px;
+    }
+
+    .acbt-phase p {
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* Coming soon */
+    .coming-soon {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 40px 28px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .coming-soon .cs-icon { font-size: 36px; margin-bottom: 16px; }
+    .coming-soon p {
+      color: var(--text-muted);
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    /* Gentle reminder badge */
+    .reminder-badge {
+      display: inline-block;
+      background: rgba(106, 158, 114, 0.1);
+      border: 1px solid rgba(106, 158, 114, 0.3);
+      color: var(--sage);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    /* Progress fill — gentle, no rings */
+    .day-progress {
+      height: 3px;
+      background: rgba(196,154,42,0.12);
+      border-radius: 3px;
+      margin: 20px 0 8px;
+      overflow: hidden;
+    }
+
+    .day-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--gold), #E8A070);
+      transition: width 0.5s ease;
+    }
+
+    .day-progress-label {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* Hourly prompt when visible */
+    .hourly-prompt {
+      background: rgba(106, 158, 114, 0.07);
+      border: 1px solid rgba(106, 158, 114, 0.22);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hourly-prompt p {
+      font-size: 15px;
+      color: var(--sage);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .hourly-log-btn {
+      background: rgba(106, 158, 114, 0.12);
+      border: 1px solid rgba(106, 158, 114, 0.35);
+      border-radius: 8px;
+      color: var(--sage);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      padding: 9px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hourly-log-btn:active { opacity: 0.7; }
+
+    /* Save indicator */
+    .saved-flash {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(106, 158, 114, 0.92);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      padding: 9px 20px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .saved-flash.show { opacity: 1; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(196,154,42,0.2); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── MORNING PAGE ──────────────────────────────────────── -->
+  <div id="page-morning" class="page active">
+
+    <div id="morning-header">
+      <img id="lotus-img" src="lotus.jpg" alt="Lotus" onerror="this.style.display='none'; document.getElementById('lotus-placeholder').style.display='flex'">
+      <div id="lotus-placeholder" style="display:none; width:100%; height:100%; background:linear-gradient(135deg,#FDF0E0,#F8E0D0,#FDF6E3); align-items:center; justify-content:center; font-size:72px;">🪷</div>
+    </div>
+
+    <div class="morning-greeting">
+      <div class="header-date" id="header-date"></div>
+      <div class="header-greeting" id="header-greeting"></div>
+    </div>
+
+    <div class="morning-body">
+
+      <div class="daily-question">
+        <p id="daily-question-text"></p>
+      </div>
+
+      <div class="day-progress">
+        <div class="day-progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="day-progress-label" id="progress-label">0 of 4 rooms visited today</div>
+
+      <div style="height:18px;"></div>
+
+      <div class="rooms-label">Your four rooms today</div>
+
+      <div class="room-row" onclick="openRoom('spiritual')">
+        <div class="room-dot dot-spiritual"></div>
+        <div class="room-info">
+          <div class="room-name">Spiritual</div>
+          <div class="room-prompt">The foundation. Enter here first.</div>
+        </div>
+        <div class="room-status" id="status-spiritual">○</div>
+      </div>
+
+      <div class="room-row" onclick="openRoom('physical')">
+        <div class="room-dot dot-physical"></div>
+        <div class="room-info">
+          <div class="room-name">Physical</div>
+          <div class="room-prompt">Move, breathe, tend the body.</div>
+        </div>
+        <div class="room-status" id="status-physical">○</div>
+      </div>
+
+      <div class="room-row" onclick="openRoom('mental')">
+        <div class="room-dot dot-mental"></div>
+        <div class="room-info">
+          <div class="room-name">Mental</div>
+          <div class="room-prompt">Think clearly. Clear the space.</div>
+        </div>
+        <div class="room-status" id="status-mental">○</div>
+      </div>
+
+      <div class="room-row" onclick="openRoom('emotional')">
+        <div class="room-dot dot-emotional"></div>
+        <div class="room-info">
+          <div class="room-name">Emotional</div>
+          <div class="room-prompt">Feel what you feel. That's enough.</div>
+        </div>
+        <div class="room-status" id="status-emotional">○</div>
+      </div>
+
+      <p class="resistance-line">"Even one room. Even two minutes. Even just this."</p>
+
+    </div>
+  </div>
+
+  <!-- ── SPIRITUAL ROOM ────────────────────────────────────── -->
+  <div id="page-spiritual" class="page">
+    <div class="room-page-header">
+      <button class="room-back" onclick="goHome()">← Four Rooms</button>
+      <div class="room-title-row">
+        <div class="room-title-dot dot-spiritual"></div>
+        <h1 class="room-title">Spiritual</h1>
+      </div>
+      <p class="room-aspiration">To return to the practice that once changed everything — chanting, polishing the mirror, trusting that from this moment the trajectory of my life can change.</p>
+    </div>
+
+    <div class="room-body">
+
+      <div class="section-label">The Gohonzon Teaching</div>
+
+      <div class="teaching-block">
+        <p>Whatever you are thinking in front of the Gohonzon will be true for you.</p>
+        <p>Are you thinking failure or victory?</p>
+        <p>Are you trying to tell the Gohonzon how to solve your problems, or are you turning over your heart's desire with unlimited trust?</p>
+        <p>The Gohonzon's power is beyond comprehension of our mind. That's why we call it mystic.</p>
+        <p>Our challenge is to dream of results as big as the power of the Gohonzon, which has no limit.</p>
+        <p>With this attitude of faith you can tap the infinite power of the Gohonzon in the depths of your life to create your future joy, gratitude and victory.</p>
+        <p>If you find that you are stuck, chant to release the chains of doubt and fear clouding your mind of faith.</p>
+        <p>Pray for unbounded confidence and courage to win over your past and step joyfully into your bright future.</p>
+      </div>
+
+      <div class="section-label">Touchstones</div>
+
+      <div class="phrase-block">
+        <p>The journey from Kamakura to Kyoto is twelve days. If you turn back on the eleventh day, how will you ever get to see the moon over the capital?</p>
+      </div>
+
+      <div class="phrase-block">
+        <p>When the moment comes, the wise rejoice and the foolish retreat.</p>
+      </div>
+
+      <div class="section-label">Did you chant today?</div>
+
+      <div class="tap-log" id="chant-log">
+        <button class="tap-btn" id="chant-yes" onclick="logChant('yes')">Yes</button>
+        <button class="tap-btn" id="chant-little" onclick="logChant('little')">A little</button>
+        <button class="tap-btn" id="chant-not" onclick="logChant('not')">Not today</button>
+      </div>
+
+      <div style="height: 20px;"></div>
+      <div class="section-label">Intention for today</div>
+      <textarea class="intention-input" id="intention-text" placeholder="One sentence, optional. What do you want to call in today?" rows="3" oninput="saveIntention()"></textarea>
+
+      <div style="height: 12px;"></div>
+    </div>
+  </div>
+
+  <!-- ── PHYSICAL ROOM ─────────────────────────────────────── -->
+  <div id="page-physical" class="page">
+    <div class="room-page-header">
+      <button class="room-back" onclick="goHome()">← Four Rooms</button>
+      <div class="room-title-row">
+        <div class="room-title-dot dot-physical"></div>
+        <h1 class="room-title">Physical</h1>
+      </div>
+      <p class="room-aspiration">To feel strong enough in my body that nothing stops me — stairs with bags, running for trains, getting up from the floor, breathing freely.</p>
+    </div>
+
+    <div class="room-body">
+
+      <div id="hourly-prompt-container"></div>
+
+      <div class="section-label">Morning movement</div>
+
+      <div class="card">
+        <p>5 minutes on the rebounder before starting work.</p>
+        <div class="tap-log">
+          <button class="tap-btn" id="morning-move-btn" onclick="logMorningMove()">Log it ✓</button>
+        </div>
+      </div>
+
+      <div class="section-label">Hourly bursts</div>
+
+      <div class="counter-display">
+        <div>
+          <div class="counter-label">2-min rebounder sessions</div>
+          <div style="font-size:13px; color:var(--text-muted); font-family:var(--font-sans);">tap to add or remove</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="counter-btn" onclick="changeHourly(-1)">−</button>
+          <div class="counter-value" id="hourly-count">0</div>
+          <button class="counter-btn" onclick="changeHourly(1)">+</button>
+        </div>
+      </div>
+
+      <div class="section-label">Once today</div>
+
+      <div class="card">
+        <p>10–15 minutes of sustained movement. Walk, stretch, mow, anything that keeps going. Dog walk counts.</p>
+        <div class="tap-log">
+          <button class="tap-btn" id="sustained-btn" onclick="logSustained()">Log it ✓</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 8px; margin-bottom: 14px;">
+        <div style="display:flex; justify-content:space-between; font-family:var(--font-sans); font-size:13px; color:var(--text-muted); margin-bottom:6px;">
+          <span>Today's movement</span>
+          <span id="minutes-today">0 min</span>
+        </div>
+        <div style="height:4px; background:rgba(196,154,42,0.12); border-radius:3px; overflow:hidden;">
+          <div id="weekly-fill" style="height:100%; border-radius:3px; background:linear-gradient(90deg,var(--sage),#A8D4AC); width:0%; transition:width 0.5s;"></div>
+        </div>
+        <div style="font-family:var(--font-sans); font-size:12px; color:var(--text-muted); margin-top:5px; text-align:right;">Target: 60 min/week</div>
+      </div>
+
+      <div class="section-label">ACBT Breathing</div>
+
+      <div class="reminder-badge">when you're ready — no pressure</div>
+
+      <div class="acbt-phase">
+        <div class="acbt-phase-label">Phase 1 — Breathing Control</div>
+        <p>Relax. Gentle lower-chest breathing at your own pace. 5–10 breaths. This is rest.</p>
+      </div>
+
+      <div class="acbt-phase">
+        <div class="acbt-phase-label">Phase 2 — Thoracic Expansion</div>
+        <p>Three to five slow deep breaths. Breathe in fully, hold 2–3 seconds, breathe out gently without forcing.</p>
+      </div>
+
+      <div class="acbt-phase">
+        <div class="acbt-phase-label">Phase 3 — The Huff</div>
+        <p>One or two huffs — not coughs. Open mouth, squeeze air out as if steaming a mirror. Then return to Phase 1.</p>
+        <p style="margin-top:8px; font-size:14px; color:var(--text-muted);">Repeat for 10–20 minutes, or until clear. Once a day to start.</p>
+      </div>
+
+      <div class="tap-log" style="margin-top:14px;">
+        <button class="tap-btn" id="acbt-btn" onclick="logACBT()">Log ACBT done ✓</button>
+      </div>
+
+      <div style="height: 12px;"></div>
+    </div>
+  </div>
+
+  <!-- ── MENTAL ROOM ───────────────────────────────────────── -->
+  <div id="page-mental" class="page">
+    <div class="room-page-header">
+      <button class="room-back" onclick="goHome()">← Four Rooms</button>
+      <div class="room-title-row">
+        <div class="room-title-dot dot-mental"></div>
+        <h1 class="room-title">Mental</h1>
+      </div>
+      <p class="room-aspiration">To think clearly, make good decisions, and create a space — physical and mental — that reflects back that I matter.</p>
+    </div>
+
+    <div class="room-body">
+      <div class="coming-soon">
+        <div class="cs-icon">🪟</div>
+        <p>This room is coming. The space where clear thinking lives — and where the physical environment around you becomes a thinking environment. Place, clarity, purpose. It is being prepared.</p>
+      </div>
+
+      <div style="height: 12px;"></div>
+    </div>
+  </div>
+
+  <!-- ── EMOTIONAL ROOM ────────────────────────────────────── -->
+  <div id="page-emotional" class="page">
+    <div class="room-page-header">
+      <button class="room-back" onclick="goHome()">← Four Rooms</button>
+      <div class="room-title-row">
+        <div class="room-title-dot dot-emotional"></div>
+        <h1 class="room-title">Emotional</h1>
+      </div>
+      <p class="room-aspiration">To feel what I feel without being derailed by it.</p>
+    </div>
+
+    <div class="room-body">
+
+      <div class="section-label">One thing I'm feeling today</div>
+      <textarea class="intention-input" id="feeling-text" placeholder="No need to explain it. Just name it." rows="3" oninput="saveFeeling()"></textarea>
+
+      <div style="height:6px;"></div>
+      <div class="section-label">One thing I'm grateful for</div>
+      <textarea class="intention-input" id="gratitude-text" placeholder="Small counts. Small often counts more." rows="3" oninput="saveGratitude()"></textarea>
+
+      <div style="height: 12px;"></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Nav -->
+<nav id="nav">
+  <button onclick="showPage('morning')" id="nav-morning" class="active">
+    <span class="nav-icon">🪷</span>
+    <span>Morning</span>
+  </button>
+  <button onclick="openRoom('spiritual')" id="nav-spiritual">
+    <span class="nav-icon">✦</span>
+    <span>Spiritual</span>
+  </button>
+  <button onclick="openRoom('physical')" id="nav-physical">
+    <span class="nav-icon">◎</span>
+    <span>Physical</span>
+  </button>
+  <button onclick="openRoom('emotional')" id="nav-emotional">
+    <span class="nav-icon">◡</span>
+    <span>Emotional</span>
+  </button>
+</nav>
+
+<!-- Save flash -->
+<div class="saved-flash" id="saved-flash">Saved</div>
+
+<script>
+// ── Utilities ──────────────────────────────────────────────
+
+const todayKey = () => new Date().toISOString().slice(0, 10);
+
+function getStore(key, fallback) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+
+function setStore(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+function flashSaved() {
+  const el = document.getElementById('saved-flash');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1400);
+}
+
+// ── Date / Greeting ─────────────────────────────────────────
+
+function setupHeader() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('header-date').textContent =
+    `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Good morning.' : h < 17 ? 'Good afternoon.' : 'Good evening.';
+  document.getElementById('header-greeting').textContent = greeting;
+}
+
+// ── Daily Question ──────────────────────────────────────────
+
+const QUESTIONS = [
+  "Are you thinking failure or victory?",
+  "Are you turning over your heart's desire with unlimited trust?",
+  "What chains of doubt or fear need releasing today?",
+  "Dream as big as the power that has no limit. What would that look like today?",
+  "This moment is a cause. What effect do you want to create?",
+  "The journey is twelve days. Which day are you on?",
+  "Pray for unbounded confidence and courage. What would that change?"
+];
+
+function setupDailyQuestion() {
+  const d = new Date();
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+  document.getElementById('daily-question-text').textContent =
+    QUESTIONS[dayOfYear % QUESTIONS.length];
+}
+
+// ── Navigation ──────────────────────────────────────────────
+
+let currentPage = 'morning';
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const navBtn = document.getElementById('nav-' + name);
+  if (navBtn) navBtn.classList.add('active');
+  currentPage = name;
+  window.scrollTo(0, 0);
+}
+
+function openRoom(room) {
+  markVisited(room);
+  showPage(room);
+  if (room === 'physical') updateHourlyPrompt();
+}
+
+function goHome() {
+  showPage('morning');
+}
+
+// ── Visited tracking ────────────────────────────────────────
+
+function markVisited(room) {
+  const key = 'visited_' + todayKey();
+  const visited = getStore(key, {});
+  if (!visited[room]) {
+    visited[room] = true;
+    setStore(key, visited);
+    updateProgress();
+    updateRoomStatuses();
+  }
+}
+
+function updateProgress() {
+  const key = 'visited_' + todayKey();
+  const visited = getStore(key, {});
+  const count = Object.keys(visited).length;
+  const pct = (count / 4) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent =
+    count === 4 ? 'All four rooms visited today ✦' : `${count} of 4 rooms visited today`;
+}
+
+function updateRoomStatuses() {
+  const key = 'visited_' + todayKey();
+  const visited = getStore(key, {});
+  ['spiritual','physical','mental','emotional'].forEach(r => {
+    const el = document.getElementById('status-' + r);
+    if (el) el.textContent = visited[r] ? '✦' : '○';
+  });
+}
+
+// ── Spiritual room ──────────────────────────────────────────
+
+function logChant(choice) {
+  const key = 'chant_' + todayKey();
+  setStore(key, choice);
+  document.querySelectorAll('#chant-log .tap-btn').forEach(b => {
+    b.classList.remove('selected-yes','selected-little','selected-not');
+  });
+  document.getElementById('chant-' + choice).classList.add('selected-' + choice);
+  markVisited('spiritual');
+  flashSaved();
+}
+
+function saveIntention() {
+  const val = document.getElementById('intention-text').value;
+  setStore('intention_' + todayKey(), val);
+  markVisited('spiritual');
+}
+
+function loadSpiritualState() {
+  const chant = getStore('chant_' + todayKey(), null);
+  if (chant) {
+    document.getElementById('chant-' + chant).classList.add('selected-' + chant);
+  }
+  const intention = getStore('intention_' + todayKey(), '');
+  document.getElementById('intention-text').value = intention;
+}
+
+// ── Physical room ───────────────────────────────────────────
+
+function logMorningMove() {
+  const key = 'morning_move_' + todayKey();
+  const done = !getStore(key, false);
+  setStore(key, done);
+  const btn = document.getElementById('morning-move-btn');
+  btn.classList.toggle('selected-yes', done);
+  btn.textContent = done ? 'Done ✓' : 'Log it ✓';
+  markVisited('physical');
+  updateMinutes();
+  flashSaved();
+}
+
+function changeHourly(delta) {
+  const key = 'hourly_' + todayKey();
+  let count = getStore(key, 0);
+  count = Math.max(0, count + delta);
+  setStore(key, count);
+  document.getElementById('hourly-count').textContent = count;
+  markVisited('physical');
+  updateMinutes();
+}
+
+function logSustained() {
+  const key = 'sustained_' + todayKey();
+  const done = !getStore(key, false);
+  setStore(key, done);
+  const btn = document.getElementById('sustained-btn');
+  btn.classList.toggle('selected-yes', done);
+  btn.textContent = done ? 'Done ✓' : 'Log it ✓';
+  markVisited('physical');
+  updateMinutes();
+  flashSaved();
+}
+
+function logACBT() {
+  const key = 'acbt_' + todayKey();
+  const done = !getStore(key, false);
+  setStore(key, done);
+  const btn = document.getElementById('acbt-btn');
+  btn.classList.toggle('selected-yes', done);
+  btn.textContent = done ? 'ACBT done ✓' : 'Log ACBT done ✓';
+  markVisited('physical');
+  flashSaved();
+}
+
+function updateMinutes() {
+  const today = todayKey();
+  const morning = getStore('morning_move_' + today, false) ? 5 : 0;
+  const hourly = getStore('hourly_' + today, 0) * 2;
+  const sustained = getStore('sustained_' + today, false) ? 12 : 0;
+  const total = morning + hourly + sustained;
+
+  // weekly total (last 7 days)
+  let weekTotal = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = d.toISOString().slice(0,10);
+    const m = getStore('morning_move_' + k, false) ? 5 : 0;
+    const h = getStore('hourly_' + k, 0) * 2;
+    const s = getStore('sustained_' + k, false) ? 12 : 0;
+    weekTotal += m + h + s;
+  }
+
+  document.getElementById('minutes-today').textContent = total + ' min today';
+  const pct = Math.min(100, (weekTotal / 60) * 100);
+  document.getElementById('weekly-fill').style.width = pct + '%';
+}
+
+function loadPhysicalState() {
+  const today = todayKey();
+
+  const morningDone = getStore('morning_move_' + today, false);
+  const morningBtn = document.getElementById('morning-move-btn');
+  morningBtn.classList.toggle('selected-yes', morningDone);
+  morningBtn.textContent = morningDone ? 'Done ✓' : 'Log it ✓';
+
+  const hourly = getStore('hourly_' + today, 0);
+  document.getElementById('hourly-count').textContent = hourly;
+
+  const sustainedDone = getStore('sustained_' + today, false);
+  const sustainedBtn = document.getElementById('sustained-btn');
+  sustainedBtn.classList.toggle('selected-yes', sustainedDone);
+  sustainedBtn.textContent = sustainedDone ? 'Done ✓' : 'Log it ✓';
+
+  const acbtDone = getStore('acbt_' + today, false);
+  const acbtBtn = document.getElementById('acbt-btn');
+  acbtBtn.classList.toggle('selected-yes', acbtDone);
+  acbtBtn.textContent = acbtDone ? 'ACBT done ✓' : 'Log ACBT done ✓';
+
+  updateMinutes();
+}
+
+// Hourly prompt — shows gently if we're in work hours and haven't done one recently
+function updateHourlyPrompt() {
+  const container = document.getElementById('hourly-prompt-container');
+  const h = new Date().getHours();
+  if (h >= 8 && h <= 18) {
+    const lastHourly = getStore('last_hourly_ts', 0);
+    const minsSince = (Date.now() - lastHourly) / 60000;
+    if (minsSince > 50) {
+      container.innerHTML = `
+        <div class="hourly-prompt">
+          <p>Time for two minutes on the rebounder?</p>
+          <button class="hourly-log-btn" onclick="quickHourly()">Done ✓</button>
+        </div>`;
+    } else {
+      container.innerHTML = '';
+    }
+  } else {
+    container.innerHTML = '';
+  }
+}
+
+function quickHourly() {
+  setStore('last_hourly_ts', Date.now());
+  changeHourly(1);
+  document.getElementById('hourly-prompt-container').innerHTML = '';
+  flashSaved();
+}
+
+// ── Emotional room ──────────────────────────────────────────
+
+function saveFeeling() {
+  setStore('feeling_' + todayKey(), document.getElementById('feeling-text').value);
+  markVisited('emotional');
+}
+
+function saveGratitude() {
+  setStore('gratitude_' + todayKey(), document.getElementById('gratitude-text').value);
+  markVisited('emotional');
+}
+
+function loadEmotionalState() {
+  document.getElementById('feeling-text').value = getStore('feeling_' + todayKey(), '');
+  document.getElementById('gratitude-text').value = getStore('gratitude_' + todayKey(), '');
+}
+
+// ── Init ────────────────────────────────────────────────────
+
+function init() {
+  setupHeader();
+  setupDailyQuestion();
+  loadSpiritualState();
+  loadPhysicalState();
+  loadEmotionalState();
+  updateProgress();
+  updateRoomStatuses();
+}
+
+init();
+</script>
+</body>
+</html>
