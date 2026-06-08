@@ -651,7 +651,13 @@
 
   <!-- ── SPIRITUAL ROOM ────────────────────────────────────── -->
   <div id="page-spiritual" class="page">
-    <div class="room-page-header">
+
+    <div style="position:relative; width:100%; aspect-ratio:4/3; overflow:hidden; background:#1a1a1a;">
+      <img src="beads.jpg" alt="Prayer beads" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 40%, rgba(253,250,244,0.95) 100%);"></div>
+    </div>
+
+    <div class="room-page-header" style="padding-top:16px; background:var(--bg);">
       <button class="room-back" onclick="goHome()">← Four Rooms</button>
       <div class="room-title-row">
         <div class="room-title-dot dot-spiritual"></div>
